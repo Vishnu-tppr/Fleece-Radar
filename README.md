@@ -177,8 +177,8 @@ This is a passive, read-only tool:
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/china-ai-provider-finder.git
-cd china-ai-provider-finder
+git clone https://github.com/Vishnu-tppr/Fleece-Radar.git
+cd Fleece-Radar
 
 # Create & activate virtual environment
 python -m venv .venv

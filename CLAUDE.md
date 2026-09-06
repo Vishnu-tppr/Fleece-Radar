@@ -1,54 +1,3 @@
-### Section 1: Prompt Diagnosis
-
-**Strengths:**
-
-- Clear overall objective: redesign a Python/FastAPI scraper + UI to discover Chinese AI gateways and surface them for OmniRoute use.  
-- Explicit target model names (Fable 5, Opus 5, GPT‑5.6 Sol, GPT‑6 Astra, DeepSeek V4 Flash, GLM‑5.3 Flash, Qwen) give the scraper strong filtering criteria.  
-- Mentions both backend (scraper) and frontend (UI), which fits an EPIC/High‑scope workflow with planning, implementation, and review.
-
-**Issues:**
-
-| Issue | Impact | Suggested Fix |
-|-------|--------|---------------|
-| “Find **all** free Chinese AI provider” and “unlimited access” are unattainable goals | ECC agent may chase an impossible target, overfit or hallucinate coverage | Clarify that the scraper should discover and maintain **as many as reasonably possible** via known directories and heuristics, and treat “unlimited” claims as **unverified marketing** |
-| No explicit list of data sources to crawl | Agent may miss key hubs like APIIndex, awesome-ai-proxy, GetCheapAI, apisou, apiranking, etc. | Add concrete sources (APIIndex, mn-api/awesome-ai-proxy, GetCheapAI, apisou, apiranking) and allow future extension via configuration  [github](https://github.com/mn-api/awesome-ai-proxy) |
-| Tech stack only loosely stated as “python ffastapi” | ECC cannot align patterns (ORM, frontend framework, storage) | Specify Python version, FastAPI, database (PostgreSQL/MySQL/SQLite), and frontend stack (pure HTML, HTMX, Tailwind, etc.) |
-| No data model or acceptance criteria | Hard to know when the scraper/UI are “good enough” | Define entities (Provider, DomainAlias, ModelRoute, FreeTierMetadata, HealthCheckResult) and acceptance criteria (coverage, deduplication, health-check, filters) |
-| No safety/ethics constraints | Agent might encourage using suspicious gateways without caveats | Require risk flags and disclaimers for unverified model identities, privacy, and legal constraints |
-
-**Needs Clarification (you can answer these before running the optimized prompt):**
-
-1. Confirm tech stack: Python version, FastAPI, DB (Postgres/MySQL/SQLite), and frontend (e.g., FastAPI + Jinja2 + Tailwind).  
-2. Where will the scraper run (single worker, scheduled job, Celery/RQ, or on‑demand via API)?  
-3. How often should it refresh provider data (e.g., every 6 hours vs. daily)?  
-4. Do you want manual curation (tags, overrides) in addition to automatic scraping?  
-5. Any hard constraints on storing user‑submitted gateways (e.g., max providers, moderation rules)?
-
-***
-
-### Section 2: Recommended ECC Components
-
-| Type | Component | Purpose |
-|------|-----------|---------|
-| Command | `/plan` | High‑level architecture and data model for scraper + FastAPI UI |
-| Command | `/tdd` | Build scraper modules and API endpoints with tests first |
-| Command | `/refactor-clean` | Redesign existing scraper codebase safely |
-| Command | `/code-review` | Review new scraper logic and security implications |
-| Command | `/verify` | Run tests, linters, and health checks before “done” |
-| Skill | `search-first` | Systematic research across Chinese AI gateway directories  [github](https://github.com/mn-api/awesome-ai-proxy) |
-| Skill | `tdd-workflow` | Keep implementation under test and avoid regressions |
-| Skill | `verification-loop` | Iterate until scraper outputs meet quality thresholds |
-| Skill | `cost-aware-llm-pipeline` | Keep ECC token usage reasonable while iterating |
-| Agent | `architect` | Choose architecture: modules, schedulers, database schema |
-| Agent | `code-reviewer` | Review Python/FastAPI code and suggest improvements |
-| Agent | `security-reviewer` | Flag privacy/security risks in using third‑party gateways |
-| Model | `Sonnet 4.6` | Main coding and refactor work for Python/FastAPI |
-| Model | `Opus 4.6` | Deeper planning for scraper architecture and heuristics |
-
-***
-
-### Section 3: Optimized Prompt — Full Version
-
 ```markdown
 You are an ECC assistant helping redesign and extend an existing Python + FastAPI project.
 
@@ -240,6 +189,24 @@ For large changes, split into multiple prompts:
 
 ---
 
+| Type | Component | Purpose |
+|------|-----------|---------|
+| Command | `/plan` | High‑level architecture and data model for scraper + FastAPI UI |
+| Command | `/tdd` | Build scraper modules and API endpoints with tests first |
+| Command | `/refactor-clean` | Redesign existing scraper codebase safely |
+| Command | `/code-review` | Review new scraper logic and security implications |
+| Command | `/verify` | Run tests, linters, and health checks before “done” |
+| Skill | `search-first` | Systematic research across Chinese AI gateway directories  [github](https://github.com/mn-api/awesome-ai-proxy) |
+| Skill | `tdd-workflow` | Keep implementation under test and avoid regressions |
+| Skill | `verification-loop` | Iterate until scraper outputs meet quality thresholds |
+| Skill | `cost-aware-llm-pipeline` | Keep ECC token usage reasonable while iterating |
+| Agent | `architect` | Choose architecture: modules, schedulers, database schema |
+| Agent | `code-reviewer` | Review Python/FastAPI code and suggest improvements |
+| Agent | `security-reviewer` | Flag privacy/security risks in using third‑party gateways |
+| Model | `Sonnet 4.6` | Main coding and refactor work for Python/FastAPI |
+| Model | `Opus 4.6` | Deeper planning for scraper architecture and heuristics |
+
+---
 ## Acceptance Criteria
 
 Consider the task “done enough” when:
@@ -255,29 +222,3 @@ Do **not**:
 - Attempt to prove model authenticity or real quota (this requires separate manual or automated benchmarking).
 - Store or use any real API keys in scraper code.
 - Promise legal or security guarantees about any provider.
-```
-
-***
-
-### Section 4: Optimized Prompt — Quick Version
-
-For EPIC‑scope scraping + UI refactor:
-
-```text
-/plan redesign of Python + FastAPI scraper & UI to discover Chinese AI gateways from APIIndex, awesome-ai-proxy, GetCheapAI, apisou, apiranking, etc., normalize providers + mirrors, and expose OmniRoute-friendly JSON + UI filters for claimed frontier models (Fable 5, Opus 5, GPT‑5.6 Sol, GPT‑6 Astra, DeepSeek V4 Flash, GLM‑5.3 Flash, Qwen). Use search-first to map data sources, then /tdd to implement directory fetchers, normalizer, metadata extractor, and health checker. /refactor-clean existing scraper. Add FastAPI endpoints + Tailwind UI. /code-review and /verify with tests and a dry-run scrape.
-```
-
-***
-
-### Section 5: Enhancement Rationale
-
-| Enhancement | Reason |
-|-------------|--------|
-| Added explicit data sources (APIIndex, awesome-ai-proxy, GetCheapAI, apisou, apiranking) | Grounds scraping in real, high-signal directories instead of vague “find everything” language  [github](https://github.com/mn-api/awesome-ai-proxy) |
-| Defined data model (Provider, DomainAlias, ModelClaim, FreeTierMetadata, HealthCheckResult) | Gives ECC clear schema to design and implement code and storage consistently |
-| Separated scraper into DirectoryFetchers, ProviderNormalizer, MetadataExtractor, HealthChecker | Encourages modular, testable architecture instead of one big script |
-| Included risk flags and disclaimers about model authenticity and “unlimited free” claims | Prevents the agent from assuming unverified marketing claims are facts; improves safety and realism |
-| Specified FastAPI API + UI behavior with filters and JSON export | Aligns output with your OmniRoute use case and makes the project’s “done” state concrete |
-| Mapped workflow to `/plan`, `search-first`, `/tdd`, `/refactor-clean`, `/code-review`, `/verify` | Ensures ECC uses the right commands and skills instead of ad‑hoc coding |
-
-> Not what you need? Tell me what to adjust, or make a normal task request if you want execution instead of prompt optimization.

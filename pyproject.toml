@@ -1,0 +1,11 @@
+[project]
+name = "china-ai-provider-finder"
+version = "1.0.0"
+description = "Passive discovery and monitoring of free/trial AI API providers"
+requires-python = ">=3.11"
+dependencies = ["fastapi==0.116.1","uvicorn[standard]==0.35.0","httpx==0.28.1","beautifulsoup4==4.13.4","pydantic==2.11.7","python-multipart==0.0.20"]
+[project.scripts]
+provider-finder = "app.cli:main"
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"

@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Fleece Radar · 薅羊毛雷达 — Free AI Provider Finder</title>
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --void: #000000;
+      --surface: #111111;
+      --surface-2: #181818;
+      --surface-3: #222222;
+      --text: #e2e2e2;
+      --muted: #8c919b;
+      --faint: #666666;
+      --border: #282828;
+      --border-hi: #424750;
+      --blue: #a1c9ff;
+      --blue-bg: #004e89;
+      --amber: #ffb59d;
+      --amber-bg: #b83900;
+      --green: #4edea3;
+      --green-bg: #00583b;
+      --red: #ffb4ab;
+      --red-bg: #571414;
+      --r: 6px;
+      --r-lg: 10px;
+      --fast: 160ms;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--void);
+      color: var(--text);
+    }
+
+    body {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 22px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+      border-radius: var(--r);
+    }
+
+    .num,
+    .mono,
+    code {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .shell {
+      max-width: 1720px;
+      margin: 0 auto;
+      padding: 0 28px 36px;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 44px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: normal;
+    }
+
+    .system-state {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .state-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      flex: none;
+    }
+
+    .state-dot.warn {
+      background: var(--amber);
+    }
+
+    .state-dot.busy {
+      background: var(--blue);
+      animation: pulseDot 1s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: .4;
+        transform: scale(.8);
+      }
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 32px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      max-width: 72ch;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--blue);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--r);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      border: 1px solid var(--border-hi);
+      background: var(--surface-2);
+    }
+
+    .wordmark {
+      margin: 0;
+      font-size: clamp(24px, 2.8vw, 32px);
+      line-height: 38px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+    }
+
+    .wordmark .zh {
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 72ch;
+      font-size: 14px;
+      line-height: 22px;
+    }
+
+    .disclaimer {
+      margin: 0;
+      max-width: 72ch;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 20px;
+      border-left: 2px solid var(--border-hi);
+      padding-left: 14px;
+    }
+
+    /* Scan Console */
+    .console {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .console-grid {
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    @media (min-width: 781px) {
+      .console-grid {
+        display: grid;
+      }
+    }
+
+    textarea.urls {
+      width: 100%;
+      min-height: 84px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 10px 14px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 22px;
+      resize: vertical;
+      transition: border-color var(--fast) ease;
+    }
+
+    textarea.urls::placeholder {
+      color: var(--faint);
+    }
+
+    textarea.urls:focus {
+      border-color: var(--blue);
+      outline: none;
+    }
+
+    textarea.urls:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .console-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 150px;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: normal;
+      border-radius: var(--r);
+      min-height: 40px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background-color var(--fast) ease, border-color var(--fast) ease, color var(--fast) ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      line-height: 1;
+    }
+
+    .btn--primary {
+      background: var(--blue-bg);
+      color: var(--text);
+      border-color: var(--blue);
+    }
+
+    .btn--primary:hover {
+      background: var(--blue);
+      color: #06080c;
+    }
+
+    .btn--secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--border-hi);
+    }
+
+    .btn--secondary:hover {
+      background: var(--surface-3);
+      border-color: var(--muted);
+      color: #ffffff;
+    }
+
+    .btn--ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      padding: 10px 14px;
+    }
+
+    .btn--ghost:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: var(--surface-2);
+    }
+
+    .btn--ghost .dl {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    button:disabled,
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    /* Rail */
+    .rail {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .filter-input {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      min-height: 40px;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 20px;
+      width: 260px;
+      transition: border-color var(--fast) ease;
+    }
+
+    .filter-input::placeholder {
+      color: var(--faint);
+    }
+
+    .filter-input:focus {
+      border-color: var(--blue);
+      outline: none;
+    }
+
+    .filter-input:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    label.check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    label.check input[type=checkbox] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      border: 1px solid var(--border-hi);
+      border-radius: var(--r);
+      background: var(--surface-2);
+      cursor: pointer;
+      display: inline-grid;
+      place-content: center;
+      transition: all var(--fast) ease;
+    }
+
+    label.check input[type=checkbox]:hover {
+      border-color: var(--blue);
+    }
+
+    label.check input[type=checkbox]:checked {
+      background: var(--blue-bg);
+      border-color: var(--blue);
+    }
+
+    label.check input[type=checkbox]::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      transform: scale(0);
+      transition: transform var(--fast) ease;
+      clip-path: polygon(14% 44%, 0 60%, 38% 100%, 100% 18%, 84% 4%, 36% 68%);
+      background: #ffffff;
+    }
+
+    label.check input[type=checkbox]:checked::before {
+      transform: scale(1);
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .msgline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 22px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .msgline.is-error {
+      color: var(--red);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex: none;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: .3;
+        transform: scale(.8);
+      }
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin: 0 0 24px 0;
+      padding: 0;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color var(--fast) ease;
+    }
+
+    .stat:hover {
+      border-color: var(--border-hi);
+    }
+
+    .stat dt {
+      order: 2;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: normal;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .stat dd {
+      order: 1;
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 26px;
+      line-height: 32px;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Table */
+    .tablewrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow-x: auto;
+      max-height: 68vh;
+    }
+
+    table.providers {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 22px;
+    }
+
+    table.providers th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--surface-2);
+      text-align: left;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-hi);
+      white-space: nowrap;
+    }
+
+    table.providers td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    table.providers tbody tr {
+      transition: background-color var(--fast) ease;
+    }
+
+    table.providers tbody tr:hover {
+      background: var(--surface-2);
+    }
+
+    /* Score */
+    .score {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .score.hi {
+      color: var(--green);
+    }
+
+    .score.mid {
+      color: var(--amber);
+    }
+
+    .score.lo {
+      color: var(--red);
+    }
+
+    /* Provider details */
+    .provider-domain {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 14px;
+      word-break: break-all;
+      transition: color var(--fast) ease;
+    }
+
+    .provider-domain:hover {
+      color: var(--blue);
+      text-decoration: underline;
+    }
+
+    .provider-title {
+      display: block;
+      font-size: 13px;
+      line-height: 20px;
+      color: var(--muted);
+      word-break: break-word;
+      margin-top: 3px;
+    }
+
+    .provider-lat {
+      display: inline-block;
+      margin-top: 5px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      padding: 2px 7px;
+      border-radius: var(--r);
+      background: var(--surface-3);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* Status */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status .sdot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status.alive {
+      color: var(--green);
+    }
+
+    .status.alive .sdot {
+      background: var(--green);
+    }
+
+    .status.dead {
+      color: var(--red);
+    }
+
+    .status.dead .sdot {
+      background: var(--red);
+    }
+
+    .status .code {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      line-height: 18px;
+      padding: 3px 8px;
+      border-radius: var(--r);
+      margin: 2px 5px 2px 0;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .badge--plat {
+      background: var(--blue-bg);
+      color: var(--blue);
+      border: 1px solid var(--border-hi);
+    }
+
+    .badge--free {
+      background: var(--amber-bg);
+      color: #ffd9c9;
+      border: 1px solid rgba(251, 191, 36, .4);
+    }
+
+    .badge--model {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, .4);
+    }
+
+    .badge--risk {
+      background: var(--red-bg);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, .4);
+      font-weight: 600;
+    }
+
+    /* Endpoints */
+    .ep {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--muted);
+    }
+
+    .ep .ok {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .empty td {
+      padding: 44px 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    /* Mirror Groups */
+    .mirrors {
+      margin: 24px 0 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 18px 22px;
+    }
+
+    .mirrors summary {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .mirrors summary:hover {
+      color: var(--blue);
+    }
+
+    .mirrors summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mirrors summary .chev {
+      display: inline-block;
+      transition: transform var(--fast) ease;
+      font-size: 11px;
+    }
+
+    .mirrors[open] summary .chev {
+      transform: rotate(90deg);
+    }
+
+    .mirror-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mirror-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      transition: border-color var(--fast) ease;
+    }
+
+    .mirror-row:hover {
+      border-color: var(--border-hi);
+    }
+
+    .mirror-title {
+      font-size: 14px;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    footer {
+      padding: 28px 0 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .shell {
+        padding: 0 16px 24px;
+      }
+      .console-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="shell">
+    <div class="topbar">
+      <div class="system-state">
+        <span class="state-dot" id="system-dot" aria-hidden="true"></span>
+        <span id="system-status">Passive discovery node · 薅羊毛雷达</span>
+      </div>
+      <div class="topbar-meta">
+        <span class="mono" id="clock">--:--:-- UTC</span>
+      </div>
+    </div>
+
+    <header>
+      <div class="brand-group">
+        <p class="eyebrow">Intelligence ledger · Chinese gateways · 中转站情报</p>
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><img src="/static/logo.png" style="width:100%; height:100%; object-fit:contain; border-radius:var(--r);"></div>
+          <h1 class="wordmark">Fleece Radar <span class="zh">薅羊毛雷达</span></h1>
+        </div>
+        <p class="subtitle">Passive discovery and capability telemetry for free Chinese LLM relay
+          infrastructure — export the survivors into <b>OmniRoute</b>.</p>
+      </div>
+      <p class="disclaimer">Passive discovery only. Model claims are marketing statements and unverified.
+        No credentials or account creation used. Don't route sensitive data through unverified relays.</p>
+    </header>
+
+    <main>
+      <section class="console" aria-label="Scan console">
+        <div class="console-grid">
+          <label class="sr-only" for="urls" style="position:absolute;left:-9999px">Provider URLs</label>
+          <textarea id="urls" class="urls" placeholder="Paste provider URLs, one per line (https://example.com/)...
+            or directory pages (apiindex.me, apisou.com, baipiao.org...) and hit Scan URLs"
+            aria-label="Provider URLs, one per line" spellcheck="false"></textarea>
+          <div class="console-actions">
+            <button id="btn-scan" type="button" class="btn btn--primary">Scan URLs</button>
+            <button id="btn-seeds" type="button" class="btn btn--secondary">Scan seeds</button>
+            <button id="btn-discover" type="button" class="btn btn--secondary">Discover directories</button>
+            <button id="btn-deep" type="button" class="btn btn--secondary">🔬 Deep research</button>
+          </div>
+        </div>
+        <div class="rail">
+          <input id="q" class="filter-input" type="search" placeholder="Filter domain or title..."
+            aria-label="Filter by domain or title" autocomplete="off">
+          <input id="model" class="filter-input" type="search" placeholder="Filter model (fable, opus, deepseek...)"
+            aria-label="Filter by model name" autocomplete="off">
+          <label class="check"><input id="alive" type="checkbox"> Alive only</label>
+          <span class="spacer"></span>
+          <a class="btn btn--ghost" href="/api/export.txt" download target="_blank" rel="noopener">TXT <span class="dl" aria-hidden="true">&darr;</span></a>
+          <a class="btn btn--ghost" href="/api/export.csv" download target="_blank" rel="noopener">CSV <span class="dl" aria-hidden="true">&darr;</span></a>
+          <a class="btn btn--ghost" href="/api/export.omniroute" download target="_blank" rel="noopener">OmniRoute JSON <span class="dl" aria-hidden="true">&darr;</span></a>
+          <a class="btn btn--ghost" href="/api/research.md" download target="_blank" rel="noopener">Report MD <span class="dl" aria-hidden="true">&darr;</span></a>
+        </div>
+        <p id="msg" class="msgline" role="status" aria-live="polite">Idle.</p>
+      </section>
+
+      <!-- Stat strip -->
+      <dl class="stats" aria-label="Result statistics">
+        <div class="stat">
+          <dt>Providers</dt>
+          <dd id="stat-total">0</dd>
+        </div>
+        <div class="stat">
+          <dt>Alive</dt>
+          <dd id="stat-alive">0</dd>
+        </div>
+        <div class="stat">
+          <dt>Free evidence</dt>
+          <dd id="stat-free">0</dd>
+        </div>
+        <div class="stat">
+          <dt>API evidence</dt>
+          <dd id="stat-api">0</dd>
+        </div>
+        <div class="stat">
+          <dt>Models via /models</dt>
+          <dd id="stat-models">0</dd>
+        </div>
+      </dl>
+
+      <!-- Provider ledger -->
+      <section class="tablewrap" aria-label="Provider results">
+        <table class="providers">
+          <caption class="sr-only" style="position:absolute;left:-9999px">Provider results: score, status, platform,
+            evidence, models, endpoints, risk</caption>
+          <thead>
+            <tr>
+              <th scope="col">Score</th>
+              <th scope="col">Provider</th>
+              <th scope="col">Status</th>
+              <th scope="col">Platform</th>
+              <th scope="col">Free evidence</th>
+              <th scope="col">Models claimed</th>
+              <th scope="col">Endpoints</th>
+              <th scope="col">Risk</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </section>
+
+      <details class="mirrors">
+        <summary><span class="chev" aria-hidden="true">&#9654;</span> Mirror groups (same gateway, multiple domains — e.g. DawCode, SheAPI, HCNSEC/IAMHC, Runtime)</summary>
+        <div id="aliases" class="mirror-list">Loading&hellip;</div>
+      </details>
+    </main>
+
+    <footer>
+      <span>Evidence is passive scan output. "Unlimited" claims are unverified marketing.</span>
+      <span class="mono">Node: fleece-radar-01</span>
+    </footer>
+  </div>
+
+  <script>
+    "use strict";
+
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => (
+      { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    ));
+
+    const $ = id => document.getElementById(id);
+
+    const POLL_MS = 1500;
+    const DEBOUNCE_MS = 250;
+    const URL_RE = /https?:\/\/[^\s]+/g;
+
+    // Known directories of Chinese AI gateways — "Discover directories" crawls these.
+    const DIRECTORIES = [
+      "https://apiindex.me/zh/self-publish",
+      "https://apisou.com/?type=公益",
+      "https://baipiao.org/free/api/",
+      "https://www.getcheapai.com/provider",
+      "https://freellm.net/",
+      "https://freeaiapi.org/",
+      "https://kelen.cc/share/free-llm-api-stations",
+      "https://apiranking.com/"
+    ];
+
+    function updateClock() {
+      const d = new Date();
+      const el = $("clock");
+      if (el) {
+        el.textContent = d.toISOString().substring(11, 19) + " UTC";
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function debounce(fn, ms) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    function setMsg(text, isError = false, isRunning = false) {
+      const el = $("msg");
+      el.classList.toggle("is-error", isError);
+      el.innerHTML = isRunning
+        ? `<span class="pulse" aria-hidden="true"></span>${esc(text)}`
+        : esc(text);
+    }
+
+    function setBusy(busy) {
+      ["btn-scan", "btn-seeds", "btn-discover", "btn-deep"].forEach(id => {
+        const el = $(id);
+        if (el) el.disabled = busy;
+      });
+      ["urls", "q", "model", "alive"].forEach(id => {
+        const el = $(id);
+        if (el) el.disabled = busy;
+      });
+      const sysDot = $("system-dot");
+      if (sysDot) sysDot.classList.toggle("busy", busy);
+    }
+
+    const badge = (text, cls) => `<span class="badge badge--${cls}">${esc(text)}</span>`;
+    const badges = (list, cls) => (list || []).map(x => badge(x, cls)).join("");
+
+    function scoreClass(score) {
+      if (score >= 70) return "hi";
+      if (score >= 40) return "mid";
+      return "lo";
+    }
+
+    function statusCell(x) {
+      const code = x.status_code ? esc(x.status_code) : "ERR";
+      return x.alive
+        ? `<span class="status alive"><span class="sdot" aria-hidden="true"></span><span class="code">${code}</span></span>`
+        : `<span class="status dead"><span class="sdot" aria-hidden="true"></span><span class="code">${code}</span></span>`;
+    }
+
+    function endpointCell(x) {
+      const pairs = Object.entries(x.public_endpoints || {})
+        .map(([path, code]) =>
+          `<div class="ep">${esc(path)} ${code === 200
+            ? `<span class="ok">${esc(code)}</span>`
+            : esc(code)}</div>`
+        )
+        .join("");
+      const models = (x.api_models && x.api_models.length)
+        ? `<div class="ep"><span class="ok num">${esc(x.api_models.length)}</span> models via /models</div>`
+        : "";
+      if (!pairs && !models) return `<span class="ep">-</span>`;
+      return pairs + models;
+    }
+
+    function row(x) {
+      const href = esc(x.final_url || x.url);
+      const lat = x.latency_ms != null
+        ? `<span class="provider-lat">${esc(x.latency_ms)} ms</span>`
+        : "";
+      const risk = (x.risk_flags || []).length
+        ? badges(x.risk_flags, "risk")
+        : `<span class="ep">-</span>`;
+      return `<tr>
+    <td class="score num ${scoreClass(x.score)}">${esc(x.score)}</td>
+    <td>
+      <a class="provider-domain" href="${href}" target="_blank" rel="noopener noreferrer">${esc(x.domain)}</a>
+      <span class="provider-title">${esc(x.title)}</span>
+      ${lat}
+    </td>
+    <td>${statusCell(x)}</td>
+    <td>${x.platform ? badge(x.platform, "plat") : `<span class="ep">-</span>`}</td>
+    <td>${(x.free_evidence || []).length ? badges(x.free_evidence, "free") : `<span class="ep">-</span>`}</td>
+    <td>${(x.models_claimed || []).length ? badges(x.models_claimed, "model") : `<span class="ep">-</span>`}</td>
+    <td>${endpointCell(x)}</td>
+    <td>${risk}</td>
+  </tr>`;
+    }
+
+    async function load() {
+      const params = new URLSearchParams({
+        q: $("q").value,
+        model: $("model").value,
+        alive: $("alive").checked
+      });
+      try {
+        const res = await fetch("/api/providers?" + params);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+
+        $("stat-total").textContent = data.length;
+        $("stat-alive").textContent = data.filter(x => x.alive).length;
+        $("stat-free").textContent = data.filter(x => (x.free_evidence || []).length).length;
+        $("stat-api").textContent = data.filter(x => x.api_compatible).length;
+        $("stat-models").textContent = data.filter(x => (x.api_models || []).length).length;
+
+        $("rows").innerHTML = data.length
+          ? data.map(row).join("")
+          : `<tr class="empty"><td colspan="8">No providers match. Scan seeds, discover directories, or paste URLs to begin.</td></tr>`;
+      } catch (err) {
+        setMsg("Load failed: " + err.message + " (check that the API is running)", true);
+      }
+    }
+
+    async function postJson(url, body) {
+      const res = await fetch(url, body
+        ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }
+        : { method: "POST" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    }
+
+    async function startScan(endpoint, body, label) {
+      setBusy(true);
+      setMsg(label + " starting…", false, true);
+      try {
+        const { job_id } = await postJson(endpoint, body);
+        if (job_id) {
+          poll(job_id, label);
+        } else {
+          setBusy(false);
+          setMsg(`${label} complete (no job returned).`);
+          load();
+        }
+      } catch (err) {
+        setBusy(false);
+        setMsg(label + " failed to start: " + err.message, true);
+      }
+    }
+
+    function scan() {
+      const urls = $("urls").value.match(URL_RE) || [];
+      if (!urls.length) {
+        setMsg("No URLs found. Paste http(s) links, one per line.", true);
+        return;
+      }
+      startScan("/api/scan", { urls }, "Scan running");
+    }
+
+    function scanSeeds() {
+      startScan("/api/scan-seeds", null, "Seed scan running");
+    }
+
+    function discoverDirectories() {
+      setMsg("Crawling " + DIRECTORIES.length + " directories for new gateways…", false, true);
+      setBusy(true);
+      postJson("/api/discover", { directory_urls: DIRECTORIES, scan: true })
+        .then(r => {
+          setBusy(false);
+          setMsg(`Discovered ${r.count} candidate URLs (scanned into DB).`);
+          load();
+          loadAliases();
+        })
+        .catch(err => {
+          setBusy(false);
+          setMsg("Discovery failed: " + err.message, true);
+        });
+    }
+
+    function deepResearch() {
+      setBusy(true);
+      setMsg(
+        "Deep research running — searching Bing/DDG/SearXNG/Mojeek + linux.do + GitHub + directories (1-3 min)…",
+        false, true
+      );
+      postJson("/api/deep-research", {})
+        .then(r => {
+          setBusy(false);
+          setMsg(
+            `Deep research done: ${r.raw_hits} raw hits → ${r.gateway_candidates} candidates → ` +
+            `${r.new_candidates} new (scanned ${r.scanned}, ${r.alive} alive).` +
+            (r.new_domains && r.new_domains.length
+              ? ` New: ${r.new_domains.slice(0, 8).join(", ")}${r.new_domains.length > 8 ? " …" : ""}`
+              : "")
+          );
+          load();
+          loadAliases();
+        })
+        .catch(err => {
+          setBusy(false);
+          setMsg("Deep research failed: " + err.message, true);
+        });
+    }
+
+    function poll(jobId, label) {
+      fetch("/api/jobs/" + encodeURIComponent(jobId))
+        .then(r => {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(job => {
+          if (job.state === "complete") {
+            setBusy(false);
+            setMsg(`${label} complete: ${job.done} scanned, ${job.alive} alive`);
+            load();
+            loadAliases();
+          } else {
+            setMsg(`${label}: ${job.done || 0}/${job.total ?? "?"}`, false, true);
+            setTimeout(() => poll(jobId, label), POLL_MS);
+          }
+        })
+        .catch(err => {
+          setBusy(false);
+          setMsg(`${label} polling failed: ${err.message}`, true);
+        });
+    }
+
+    async function loadAliases() {
+      try {
+        const res = await fetch("/api/aliases");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const groups = await res.json();
+        const entries = Object.entries(groups);
+        $("aliases").innerHTML = entries.length
+          ? entries.map(([title, domains]) =>
+            `<div class="mirror-row">` +
+            `<span class="mirror-title">${esc(title)}</span>` +
+            domains.map(d => {
+              const url = esc(/^https?:\/\//i.test(d) ? d : `https://${d}`);
+              return `<a class="badge badge--plat" href="${url}" target="_blank" rel="noopener noreferrer">${esc(d)}</a>`;
+            }).join("") +
+            `</div>`
+          ).join("")
+          : `<div class="mirror-row"><span class="ep">No mirror groups detected yet.</span></div>`;
+      } catch (err) {
+        $("aliases").innerHTML =
+          `<div class="mirror-row"><span class="ep" style="color:var(--red)">Aliases load failed: ${esc(err.message)}</span></div>`;
+      }
+    }
+
+    /* Wiring */
+    $("btn-scan").addEventListener("click", scan);
+    $("btn-seeds").addEventListener("click", scanSeeds);
+    $("btn-discover").addEventListener("click", discoverDirectories);
+    $("btn-deep").addEventListener("click", deepResearch);
+    $("q").addEventListener("input", debounce(load, DEBOUNCE_MS));
+    $("model").addEventListener("input", debounce(load, DEBOUNCE_MS));
+    $("alive").addEventListener("change", load);
+
+    load();
+    loadAliases();
+  </script>
+</body>
+
+</html>

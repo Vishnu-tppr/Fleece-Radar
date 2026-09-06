@@ -1,0 +1,11 @@
+services:
+  finder:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_PATH: /app/data/providers.db
+      SCAN_CONCURRENCY: 8
+      REQUEST_TIMEOUT: 12
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

@@ -14,6 +14,18 @@ It also goes out and finds new providers on its own.</i>
 
 ---
 
+## ⚠️ Disclaimer
+
+> **Fleece Radar is an independent, community-built tool and is not affiliated with, endorsed by, or sponsored by any AI model provider, relay service, or website it discovers or lists.**
+>
+> The providers and endpoints identified by this project may be **temporary, unofficial, unreliable, or operated by third parties**. Availability, pricing, credits, models, limits, and terms may change at any time.
+>
+> **Use the discovered services at your own risk.** Do not submit sensitive, confidential, personal, or proprietary information through third-party API endpoints. The project does not guarantee the safety, availability, accuracy, legality, or reliability of any provider it discovers.
+>
+> Fleece Radar is intended for **research, discovery, and testing purposes**. Users are responsible for complying with the terms of service, applicable laws, and policies of the services they choose to use.
+
+---
+
 ## Why this exists
 
 Chinese AI relay gateways (中转站 / 公益站) come and go constantly. New domain, promo credits (注册送 / 签到), dead in a month. Checking by hand which ones are alive, which support frontier models (Claude Opus 5, Claude Fable 5, GPT-6 Astra, GPT-5.6 Sol, DeepSeek V4 Flash, GLM-5.3 Flash, Qwen), and wiring them into OmniRoute is a chore nobody wants to repeat every week.

@@ -14,8 +14,8 @@ It also goes out and finds new providers on its own.</i>
 
 ---
 
-## ⚠️ Disclaimer
 
+> [!CAUTION]
 > **Fleece Radar is an independent, community-built tool and is not affiliated with, endorsed by, or sponsored by any AI model provider, relay service, or website it discovers or lists.**
 >
 > The providers and endpoints identified by this project may be **temporary, unofficial, unreliable, or operated by third parties**. Availability, pricing, credits, models, limits, and terms may change at any time.
